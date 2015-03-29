@@ -1,0 +1,17 @@
+{
+    "name": "Radek/dumb-dump",
+    "require": {
+        "codegyre/robo": "*",
+        "symfony/yaml": "~2.6",
+        "symfony/config": "~2.6"
+    },
+    "authors": [
+        {
+            "name": "Radek Baczynski",
+            "email": "radek.baczynski@gmail.com"
+        }
+    ],
+	"autoload": {
+		"psr-4": {"DumbDump\\": "src/"}
+	}
+}
