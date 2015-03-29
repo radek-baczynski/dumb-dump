@@ -2,7 +2,10 @@
 
 namespace DumbDump\Task;
 
+use Robo\Common\ExecOneCommand;
+use Robo\Common\TaskIO;
 use Robo\Task\Base\ParallelExec;
+use Robo\Task\BaseTask;
 
 /**
  * Created by PhpStorm.
@@ -10,13 +13,15 @@ use Robo\Task\Base\ParallelExec;
  * Date: 04/12/14
  * Time: 13:41
  */
-class RestoreTask extends ParallelExec
+class RestoreTask extends BaseTask
 {
+	use ExecOneCommand, TaskIO;
+
 	protected $destinationUser;
 	protected $destinationPass;
 	protected $destinationHost;
 
-	protected $dumps = [];
+	protected $file;
 
 	function __construct($destinationHost, $destinationUser, $destinationPass)
 	{
@@ -26,20 +31,32 @@ class RestoreTask extends ParallelExec
 	}
 
 
-	public function restore(array $dumpFiles)
+	public function restore($file)
 	{
-		foreach ($dumpFiles as $file)
-		{
-			$cmd = 'gunzip -c %s | mysql -u%s --password="%s" -h%s';
-			$cmd = sprintf($cmd, $file, $this->destinationUser, $this->destinationPass, $this->destinationHost);
-			$this->process($cmd);
-		}
+		$this->file = $file;
 
-		return $this->run();
+		return $this;
 	}
 
-	public function restoreRemote(array $urls)
+	/**
+	 * @return \Robo\Result
+	 */
+	function run()
 	{
+		$this->option('-h', $this->destinationHost);
 
+		if ($this->destinationPass)
+		{
+			$this->option('-p', $this->destinationPass);
+		}
+
+		$this->option('-u', $this->destinationUser);
+
+		$this->printTaskInfo(sprintf('Restoring from file %s', $this->file), $this);
+
+		$cmd = sprintf('gunzip -c %s | mysql %s', $this->file, $this->arguments);
+		$res = $this->executeCommand($cmd);
+
+		return $res;
 	}
 }

@@ -7,36 +7,14 @@ use Robo\Task\Base\loadTasks;
 
 class DumpData extends Base implements CommandInterface
 {
-	protected $outFile;
 	protected $includeTables = [];
 	protected $excludeTables = [];
-	protected $gzip = true;
 
-	protected $database;
-
-	function __construct($outFile, $sourceHost, $sourceUser, $sourcePass)
-	{
-		$this->outFile = $outFile;
-		$this->source($sourceHost, $sourceUser, $sourcePass);
-	}
+	protected $type = 'data';
 
 	public function includeTables($tables = [])
 	{
 		$this->includeTables = array_merge($this->includeTables, $tables);
-
-		return $this;
-	}
-
-	public function database($databaseName)
-	{
-		$this->database = $databaseName;
-
-		return $this;
-	}
-
-	public function gzip($trueOrFalse)
-	{
-		$this->gzip = $trueOrFalse;
 
 		return $this;
 	}
@@ -55,11 +33,11 @@ class DumpData extends Base implements CommandInterface
 
 		if ($this->gzip)
 		{
-			return sprintf('mysqldump %s | gzip > %s.gz', $this->arguments, $this->outFile);
+			return sprintf('mysqldump %s | gzip > %s', $this->arguments, $this->getOutFile());
 		}
 		else
 		{
-			return sprintf('mysqldump %s > %s', $this->arguments, $this->outFile);
+			return sprintf('mysqldump %s > %s', $this->arguments, $this->getOutFile());
 		}
 	}
 

@@ -4,7 +4,7 @@
  * Date: 26/03/15 12:03
  */
 
-namespace DBBuilder;
+namespace DumbDump\Config;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

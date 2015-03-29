@@ -23,7 +23,10 @@ class RoboFile extends \Robo\Tasks
 		$definition = $this->getDefinition($options['config'], $definitionName);
 		$output     = $this->getOutputDir($definitionName);
 
-		$task = $this->taskDump($output, 'localhost', 'root', '');
+		$config = $this->getConfig($options['config']);
+
+		$source = $config['config']['source'];
+		$task   = $this->taskDump($output, $source['host'], $source['user'], $source['password']);
 
 		$task->outputOneFile($this->getOutputOneFile($output, $definitionName));
 
@@ -46,17 +49,25 @@ class RoboFile extends \Robo\Tasks
 	function dbRestore($definitionName, $options = ['config' => 'config.yml'])
 	{
 		$definition = $this->getDefinition($options['config'], $definitionName);
+		$config     = $this->getConfig($options['config']);
 
-		$dir = $this->getOutputDir($definitionName);
-		$source     = $this->getOutputOneFile($dir, $definitionName);
+		$dir  = $this->getOutputDir($definitionName);
+		$file = $this->getOutputOneFile($dir, $definitionName);
 
-		$task = $this->taskRestore($source);
+		$destination = $config['config']['destination'];
 
+		$task = $this->taskDumpRestore($destination['host'], $destination['user'], $destination['password']);
+		$task->restore($file);
 		$task->run();
 	}
 
 	protected function getConfig($file)
 	{
+		if(!file_exists($file))
+		{
+			throw new \Exception('Given  `'.$file.'` project file does not exists, create new one');
+		}
+
 		$fileContent = file_get_contents($file);
 		$config      = Yaml::parse($fileContent);
 
@@ -68,42 +79,6 @@ class RoboFile extends \Robo\Tasks
 		);
 
 		return $processedConfiguration;
-	}
-
-	public function pharBuild()
-	{
-		$this->taskComposerInstall()
-			->printed(false)
-			->noDev()
-			->run();
-
-		$packer = $this->taskPackPhar(self::PHAR_NAME);
-		$files  = Finder::create()->ignoreVCS(true)
-			->files()
-			->name('*.php')
-			->path('src')
-			->path('vendor')
-			->in(__DIR__);
-
-		foreach ($files as $file)
-		{
-			$packer->addFile($file->getRelativePathname(), $file->getRealPath());
-		}
-
-		$packer->addFile('RoboFile.php', __FILE__);
-		$packer->addFile('run', __DIR__ . '/runamb85');
-
-
-		file_put_contents($file = tempnam(sys_get_temp_dir(), 'stub'), $this->getStub());
-		$packer
-			->stub($file)
-			->run();
-
-		unlink($file);
-
-		$this->taskComposerInstall()
-			->printed(false)
-			->run();
 	}
 
 	protected function getDefinition($config, $definitionName)
