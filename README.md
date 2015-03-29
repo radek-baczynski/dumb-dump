@@ -8,7 +8,7 @@ Simple tool for dumping and restoring databases. Dedicated to dev teams, who wan
 
 or
 
-```wget https://github.com/radek-baczynski/dumb-dump/blob/master/build/dumbdump.phar```
+```curl -L -o dumbdump.phar https://github.com/radek-baczynski/dumb-dump/blob/master/build/dumbdump.phar?raw=true```
 
 and run 
 
