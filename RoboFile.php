@@ -97,7 +97,14 @@ class RoboFile extends \Robo\Tasks
 
 	protected function getOutputDir($definitionName)
 	{
-		return sys_get_temp_dir() . '/dumbdump/' . $definitionName;
+		$dir = sys_get_temp_dir() . '/dumbdump/' . $definitionName;
+
+		if(!is_dir($dir))
+		{
+			mkdir($dir, 0770, true);
+		}
+
+		return $dir;
 	}
 
 	protected function getOutputOneFile($dir, $definitionName)
