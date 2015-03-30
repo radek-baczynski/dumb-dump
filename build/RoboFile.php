@@ -8,6 +8,7 @@ use Symfony\Component\Finder\Finder;
  */
 class RoboFile extends \Robo\Tasks
 {
+
 	public function pharBuild()
 	{
 		$packer = $this->taskPackPhar('dumbdump.phar');
@@ -31,5 +32,12 @@ class RoboFile extends \Robo\Tasks
 			->executable('stub.php')
 			->run();
 
+	}
+
+	public function pharInstall()
+	{
+		$this->taskFilesystemStack()
+			->copy('dumbdump.phar', '/usr/local/bin/dumbdump', true)
+			->run();
 	}
 }
