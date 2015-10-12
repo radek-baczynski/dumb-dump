@@ -47,7 +47,7 @@ class RestoreTask extends BaseTask
 
 		if ($this->destinationPass)
 		{
-			$this->option('-p', $this->destinationPass);
+			$this->arg('--password="'.$this->destinationPass.'"');
 		}
 
 		$this->option('-u', $this->destinationUser);
